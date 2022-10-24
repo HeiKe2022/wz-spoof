@@ -2,6 +2,7 @@ local mt = getrawmetatable(game)
 local oldindex = mt.__index
 local oldnewindex = mt.__newindex
 local Players = game:GetService('Players')['LocalPlayer']
+local Character = Players.Character or Players.CharacterAdded:Wait()
 setreadonly(mt, false)
 
 local hum = Players.Character.Humanoid
