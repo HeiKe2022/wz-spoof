@@ -1,6 +1,7 @@
 local mt = getrawmetatable(game)
 local oldindex = mt.__index
 local oldnewindex = mt.__newindex
+local Players = game:GetService('Players')['LocalPlayer']
 setreadonly(mt, false)
 
 local hum = Players.Character.Humanoid
