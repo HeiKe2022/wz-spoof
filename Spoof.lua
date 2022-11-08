@@ -1,4 +1,5 @@
-
+local Players = game:GetService('Players')['LocalPlayer']
+local Character = Players.Character or Players.CharacterAdded:Wait()
 local spoof = function(instance, property)
     local spoofer = {
         enabled = true,
