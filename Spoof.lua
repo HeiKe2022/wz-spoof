@@ -1,45 +1,51 @@
-local mt = getrawmetatable(game)
-local oldindex = mt.__index
-local oldnewindex = mt.__newindex
-local Players = game:GetService('Players')['LocalPlayer']
-local Character = Players.Character or Players.CharacterAdded:Wait()
-setreadonly(mt, false)
 
-local hum = Players.Character.Humanoid
-local ows = hum.WalkSpeed
-local ojp = hum.JumpPower
-local cmzd = Players.CameraMaxZoomDistance
+local spoof = function(instance, property)
+    local spoofer = {
+        enabled = true,
+        fake = instance[property],
+        fake_type = typeof(fake),
+    }
+    local _index
+    local _newindex
+    function spoofer:SetFake(new_value, any_type)
+        if any_type then
+            spoofer.fake = new_value
+        elseif typeof(new_value) == spoofer.fake_type then
+            spoofer.fake = new_value
+        else
+            spoofer.fake = nil
+        end
+    end
+    function spoofer:Destroy()
+        instance[property] = spoofer.fake
+        spoofer.enabled = false
+    end
+    if hookmetamethod then
+        _index = hookmetamethod(instance, '__index', function(self, index)
+            if self == instance and index == property and not checkcaller() and spoofer.enabled then
+                return spoofer.fake
+            end
 
-mt.__newindex = newcclosure(function(t, k, v)
-    if checkcaller() then
-        return oldnewindex(t,k,v)
-    elseif (t:IsA'Humanoid' and k == 'WalkSpeed') then
-        v = tonumber(v)
-        if not v then v = 0 end
-        ows = v
-    elseif (t:IsA'Humanoid' and k == 'JumpPower') then
-        v = tonumber(v)
-        if not v then v = 0 end
-        ojp = v
-    elseif (t:IsA'Player' and k == 'CameraMaxZoomDistance') then
-        v = tonumber(v)
-        if not v then v = 0 end
-        cmzd = v
+            return _index(self, index)
+        end)
+        _newindex = hookmetamethod(instance, '__newindex', function(self, index, value)
+            if self == instance and index == property and not checkcaller() and spoofer.enabled then
+                if typeof(value) == spoofer.fake_type then
+                    spoofer.fake = value
+                    return
+                else
+                    spoofer.fake = nil
+                    return
+                end
+            end
+            return _newindex(self, index, value)
+        end)
     else
-        return oldnewindex(t,k,v)
+        return
     end
-end)
-mt.__index = newcclosure(function(t, k)
-    if checkcaller() then
-        return oldindex(t,k)
-    elseif (t:IsA'Humanoid' and k == 'WalkSpeed') then
-        return ows
-    elseif (t:IsA'Humanoid' and k == 'JumpPower') then
-        return ojp
-    elseif (t:IsA'Player' and k == 'CameraMaxZoomDistance') then
-        return cmzd
-    else
-        return oldindex(t,k)
-    end
-end)
-setreadonly(mt, true)
+    return spoofer
+end
+
+local speed_spoof = spoof(Players.Character.Humanoid, 'WalkSpeed')
+local jump_spoof = spoof(Players.Character.Humanoid, 'JumpPower')
+local camera_spoof = spoof(Players, 'CameraMaxZoomDistance')
