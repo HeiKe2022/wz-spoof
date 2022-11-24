@@ -47,6 +47,6 @@ local spoof = function(instance, property)
     return spoofer
 end
 
-local speed_spoof = spoof(Players.Character.Humanoid, 'WalkSpeed')
-local jump_spoof = spoof(Players.Character.Humanoid, 'JumpPower')
-local camera_spoof = spoof(Players, 'CameraMaxZoomDistance')
+spoof(Players.Character.Humanoid, 'WalkSpeed')
+spoof(Players.Character.Humanoid, 'JumpPower')
+spoof(Players, 'CameraMaxZoomDistance')
